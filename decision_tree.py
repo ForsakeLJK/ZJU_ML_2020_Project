@@ -220,6 +220,8 @@ class DecisionTree:
         majority_label = y[0]
         #TODO: YOUR CODE HERE
         # begin answer
+        from collections import Counter
+        majority_label = Counter(y).most_common(1)[0][0]
         # end answer
         return majority_label
 
