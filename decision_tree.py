@@ -188,8 +188,7 @@ class DecisionTree:
         best_feature_idx = 0
         D = X.shape[1]
 
-        #TODO: sampling needed
-        #TODO? do we need truncate features per recursion?
+        #TODO: sampling needed for random forest
         score = np.zeros((D,))
         for d in range(D):
             score[d] = self.criterion(X, y, d, sample_weights)
