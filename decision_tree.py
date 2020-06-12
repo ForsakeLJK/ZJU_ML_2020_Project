@@ -181,11 +181,19 @@ class DecisionTree:
         Returns:
             (int): the index for the best feature
         """
-        best_feature_idx = 0
         #TODO: YOUR CODE HERE
         # Note that you need to implement the sampling feature part here for random forest!
         # Hint: You may find `np.random.choice` is useful for sampling.
         # begin answer
+        best_feature_idx = 0
+        D = X.shape[1]
+
+        score = np.zeros((D,))
+        for d in range(D):
+            score[d] = self.criterion(X, y, d, sample_weights)
+        
+        best_feature_idx = np.argmax(score)
+
         # end answer
         return best_feature_idx
 
