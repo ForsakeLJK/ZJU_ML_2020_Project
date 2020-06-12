@@ -295,7 +295,7 @@ class DecisionTree:
         3.  split dataset
         4.  if no other attributes in the subset
                 majority vote, get the labels, add them into values of fea_dict
-            elif max_depth or in each branch samlples are all the same
+            elif max_depth reached or labels are all the same
                 majority vote, get the labels, add them into values of fea_dict
             else
                 build subtrees, add them into values of the fea_dict
@@ -332,7 +332,7 @@ class DecisionTree:
             if X_sub.size == 0:
                 # empty, no other attributes
                 fea_dict[best_fea_val] = self.majority_vote(y_sub)
-            elif (depth == self.max_depth) or (X_sub == X_sub[0]).all():
+            elif (depth == self.max_depth) or (y_sub == y_sub[0]).all(): # or (X_sub == X_sub[0]).all():
                 # max_depth reached, or samples in subset are all the same
                 fea_dict[best_fea_val] = self.majority_vote(y_sub)
             else:
