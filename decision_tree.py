@@ -194,11 +194,12 @@ class DecisionTree:
         # Hint: Do not forget to remove the index-th feature from X.
         # begin answer
         sample_indices = np.argwhere(np.array(X[:, index] == value) == True)
+        sample_indices = sample_indices.ravel()
         sub_X = X[sample_indices]
         sub_y = y[sample_indices]
         sub_sample_weights = sample_weights[sample_indices]
-        # remove the index-th feature from X
-        np.delete(sub_X, index, axis=1)
+        
+        sub_X = np.delete(sub_X, index, axis=1)
         # end answer
         return sub_X, sub_y, sub_sample_weights
 
@@ -308,12 +309,15 @@ class DecisionTree:
             }
         }
         '''
+        from copy import deepcopy
+        fea_names = deepcopy(feature_names)
+
         # step 1
         mytree = dict()
         best_fea_idx = self._choose_best_feature(X, y, sample_weights)
-        best_fea_name = feature_names[best_fea_idx]
+        best_fea_name = fea_names[best_fea_idx]
         mytree[best_fea_name] = {}
-        feature_names.remove(best_fea_name)
+        fea_names.remove(best_fea_name)
 
         # step 2
         fea_dict = dict()
@@ -324,17 +328,16 @@ class DecisionTree:
         for best_fea_val in best_fea_vals:
             fea_dict[best_fea_val] = {}
             # Note: the idx-th feature has been removed from X here
-            X_sub, y_sub, sample_weights_sub = 
-                self._split_dataset(X, y, best_fea_idx, best_fea_val, sample_weights)
+            X_sub, y_sub, sample_weights_sub = self._split_dataset(X, y, best_fea_idx, best_fea_val, sample_weights)
             if X_sub.size == 0:
                 # empty, no other attributes
                 fea_dict[best_fea_val] = self.majority_vote(y_sub)
-            elif depth == self.max_depth or (X_sub == X_sub[0]).all():
+            elif (depth == self.max_depth) or (X_sub == X_sub[0]).all():
                 # max_depth reached, or samples in subset are all the same
                 fea_dict[best_fea_val] = self.majority_vote(y_sub)
             else:
                 # general case
-                fea_dict[best_fea_val] = self._build_tree(X_sub, y_sub, feature_names, depth+1, sample_weights)
+                fea_dict[best_fea_val] = self._build_tree(X_sub, y_sub, fea_names, depth+1, sample_weights)
             
         # step 5
         mytree[best_fea_name] = fea_dict
