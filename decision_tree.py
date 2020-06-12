@@ -73,6 +73,19 @@ class DecisionTree:
         entropy = 0.0
         #TODO: YOUR CODE HERE
         # begin answer
+        if y.size <= 1:
+            return float(0)
+
+        labels, cnt = np.unique(y, return_counts=True)
+        fracs = cnt / y.size
+
+        entropy = 0
+
+        for frac in fracs:
+            entropy += frac * np.log(frac)
+
+        entropy = -entropy
+
         # end answer
         return entropy
 
@@ -91,6 +104,19 @@ class DecisionTree:
         info_gain = 0
         #TODO: YOUR CODE HERE
         # begin answer
+        N, D = X.shape
+        X_ent = self.entropy(y, sample_weights)
+        fea_vals, val_cnt = np.unique(X[:, index], return_counts=True)
+
+
+        sub_ent = 0
+
+        for fea_val, cnt in zip(fea_vals, val_cnt):
+            sample_indices = np.argwhere(np.array(X[:, index] == fea_val) == True)
+            sub_ent += cnt / N * self.entropy(y[sample_indices], sample_weights[sample_indices])
+
+        info_gain = X_ent - sub_ent
+
         # end answer
         return info_gain
 
