@@ -188,6 +188,7 @@ class DecisionTree:
         best_feature_idx = 0
         D = X.shape[1]
 
+        #TODO: sampling needed
         score = np.zeros((D,))
         for d in range(D):
             score[d] = self.criterion(X, y, d, sample_weights)
