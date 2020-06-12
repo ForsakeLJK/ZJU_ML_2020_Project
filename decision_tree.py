@@ -259,7 +259,9 @@ class DecisionTree:
         1.  find the best feature, add its name to dict as a key
         2.  create fea_dict, set its keys as feature values
         3.  split dataset
-        4.  if max_depth or in each branch samlples are all the same
+        4.  if no other attributes in the subset
+                majority vote, get the labels, add them into values of fea_dict
+            elif max_depth or in each branch samlples are all the same
                 majority vote, get the labels, add them into values of fea_dict
             else
                 build subtrees, add them into values of the fea_dict
@@ -278,6 +280,7 @@ class DecisionTree:
         best_fea_idx = self._choose_best_feature(X, y, sample_weights)
         best_fea_name = feature_names[best_fea_idx]
         mytree[best_fea_name] = {}
+        feature_names.remove(best_fea_name)
 
         # step 2
         fea_dict = dict()
@@ -287,11 +290,17 @@ class DecisionTree:
         # step 3 and 4
         for best_fea_val in best_fea_vals:
             fea_dict[best_fea_val] = {}
+            # Note: the idx-th feature has been removed from X here
             X_sub, y_sub, sample_weights_sub = 
                 self._split_dataset(X, y, best_fea_idx, best_fea_val, sample_weights)
-            if depth == self.max_depth or (X_sub == X_sub[0]).all():
+            if X_sub.size == 0:
+                # empty, no other attributes
+                fea_dict[best_fea_val] = self.majority_vote(y_sub)
+            elif depth == self.max_depth or (X_sub == X_sub[0]).all():
+                # max_depth reached, or samples in subset are all the same
                 fea_dict[best_fea_val] = self.majority_vote(y_sub)
             else:
+                # general case
                 fea_dict[best_fea_val] = self._build_tree(X_sub, y_sub, feature_names, depth+1, sample_weights)
             
         # step 5
