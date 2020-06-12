@@ -119,6 +119,30 @@ class DecisionTree:
 
         # end answer
         return info_gain
+    
+    def _intrinsic_value(self, X, y, index, sample_weights):
+        """Calculate the intrinsic value given a vector of features
+
+        Args:
+            X: training features, of shape (N, D).
+            y: vector of training labels, of shape (N,).
+            index: the index of the feature for calculating. 0 <= index < D
+            sample_weights: weights for each samples, of shape (N,).
+
+        Returns:
+            (float): the intrinsic value calculated.
+        """
+        intrinsic_val = 0
+
+        N, D = X.shape
+        _, val_cnt = np.unique(X[:, index], return_counts=True)
+
+        for cnt in val_cnt:
+            intrinsic_val += cnt / N * np.log2(cnt/N)
+
+        intrinsic_val = -intrinsic_val
+
+        return intrinsic_val
 
     def _information_gain_ratio(self, X, y, index, sample_weights):
         """Calculate the information gain ratio given a vector of features.
@@ -133,9 +157,14 @@ class DecisionTree:
             (float): the information gain ratio calculated.
         """
         info_gain_ratio = 0
-        split_information = 0.0
+
         #TODO: YOUR CODE HERE
         # begin answer
+        info_gain = self._information_gain(X, y, index, sample_weights)
+        intrinsic_value = self._intrinsic_value(X, y, index, sample_weights)
+
+        info_gain_ratio = info_gain / intrinsic_value
+        
         # end answer
         return info_gain_ratio
 
@@ -221,7 +250,6 @@ class DecisionTree:
         best_feature_idx = 0
         D = X.shape[1]
 
-        #TODO: sampling needed for random forest
         score = np.zeros((D,))
         for d in range(D):
             score[d] = self.criterion(X, y, d, sample_weights)
