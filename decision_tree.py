@@ -167,6 +167,12 @@ class DecisionTree:
         #TODO: YOUR CODE HERE
         # Hint: Do not forget to remove the index-th feature from X.
         # begin answer
+        sample_indices = np.argwhere(np.array(X[:, index] == value) == True)
+        sub_X = X[sample_indices]
+        sub_y = y[sample_indices]
+        sub_sample_weights = sample_weights[sample_indices]
+        # remove the index-th feature from X
+        np.delete(sub_X, index, axis=1)
         # end answer
         return sub_X, sub_y, sub_sample_weights
 
