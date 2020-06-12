@@ -1,5 +1,5 @@
 import numpy as np
-
+from copy import deepcopy
 
 class DecisionTree:
     '''Decision Tree Classifier.
@@ -309,7 +309,6 @@ class DecisionTree:
             }
         }
         '''
-        from copy import deepcopy
         fea_names = deepcopy(feature_names)
 
         # step 1
@@ -368,10 +367,49 @@ class DecisionTree:
             """
             #TODO: YOUR CODE HERE
             # begin answer
+            pred_label = 0
+
+            test_fea = (list(tree.keys()))[0]
+            test_fea_dict = tree.get(test_fea)
+            test_fea_vals = list(test_fea_dict.keys())
+
+            test_fea_idx = feature_names.index(test_fea)
+            x_test_fea_val = x[test_fea_idx]
+
+            if x_test_fea_val in test_fea_vals:
+                pass
+            else:
+                # choose a branch randomly
+                import random 
+                x_test_fea_val = random.choice(test_fea_vals)
+
+            subtree = test_fea_dict.get(x_test_fea_val)
+            if type(subtree) is dict:
+                pred_label = _classify(deepcopy(subtree), x)
+            else:
+                pred_label = subtree
+
+            return pred_label
             # end answer
 
         #TODO: YOUR CODE HERE
         # begin answer
+        if self._tree is None:
+            raise RuntimeError("Estimator not fitted, call `fit` first")
+
+    
+        N, D = X.shape
+        predictions = np.zeros((N,))
+        feature_names = X.columns.tolist()
+
+        X = X.values
+
+        dt = deepcopy(self._tree)
+
+        for i in range(N):
+            predictions[i] = _classify(dt, X[i])
+        
+        return predictions
         # end answer
 
     def show(self):
