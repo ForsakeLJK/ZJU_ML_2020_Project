@@ -179,9 +179,21 @@ class DecisionTree:
         Returns:
             (float): the gini impurity for y.
         """
-        gini = 1
         #TODO: YOUR CODE HERE
         # begin answer
+        if y.size <= 1:
+            return float(0)
+
+        labels, cnt = np.unique(y, return_counts=True)
+        fracs = cnt / y.size
+
+        gini = 0
+
+        for frac in fracs:
+            gini += np.square(frac)  
+
+        gini = 1 - gini
+
         # end answer
         return gini
 
@@ -200,6 +212,18 @@ class DecisionTree:
         new_impurity = 1
         #TODO: YOUR CODE HERE
         # begin answer
+        N, D = X.shape
+
+        fea_vals, val_cnt = np.unique(X[:, index], return_counts=True)
+
+        new_impurity = 0
+
+        for fea_val, cnt in zip(fea_vals, val_cnt):
+            sample_indices = np.argwhere(
+                np.array(X[:, index] == fea_val) == True)
+            new_impurity += cnt / N * \
+                self.gini_impurity(y[sample_indices], sample_weights[sample_indices])
+
         # end answer
         return new_impurity
 
@@ -254,7 +278,10 @@ class DecisionTree:
         for d in range(D):
             score[d] = self.criterion(X, y, d, sample_weights)
         
-        best_feature_idx = np.argmax(score)
+        if self.criterion == self._gini_purification:
+            best_feature_idx = np.argmin(score)
+        else:    
+            best_feature_idx = np.argmax(score)
 
         # end answer
         return best_feature_idx
