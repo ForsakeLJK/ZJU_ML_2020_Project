@@ -272,22 +272,6 @@ class DecisionTree:
         # Hint: You may find `np.random.choice` is useful for sampling.
         # begin answer
 
-        # N, D = X.shape
-
-        # # if sampling features needed
-        # if D <= 1:
-        #     pass
-        # elif self.sample_feature == True:
-        #     # X = deepcopy(X)
-        #     sample_fea_size = np.rint(np.sqrt(D)).astype(int)
-        #     sample_fea_indices = np.random.choice(D, size=sample_fea_size, replace=False)
-        #     sample_fea_indices = np.sort(sample_fea_indices)
-        #     X = X[:, sample_fea_indices]
-        #     y = y[sample_fea_indices]
-        #     sample_weights = sample_weights[sample_fea_indices]
-        #     fea_names = np.array(fea_names)[sample_fea_indices].tolist()
-        #     print(X.shape, y.shape, sample_weights.shape, len(fea_names))
-
         best_feature_idx = 0
         D = X.shape[1]
 
