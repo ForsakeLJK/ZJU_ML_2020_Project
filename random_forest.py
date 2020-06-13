@@ -43,11 +43,17 @@ class RandomForest:
         X_bootstrap = np.zeros((N, D))
         y_bootstrap = np.zeros((N,))
         
-        for i in range(N):
-            choice_idx = np.random.choice(N, replace=True)
-            choice_idx = np.sort(choice_idx)
-            X_bootstrap[i] = X[choice_idx]
-            y_bootstrap[i] = y[choice_idx]
+        # for i in range(N):
+        #     choice_idx = np.random.choice(N, replace=True)
+        #     # choice_idx = np.sort(choice_idx)
+        #     X_bootstrap[i] = X[choice_idx]
+        #     y_bootstrap[i] = y[choice_idx]
+
+        choice_indices = np.random.choice(N, size=N, replace=True)
+        choice_indices = np.sort(choice_indices)
+
+        X_bootstrap = X.iloc[choice_indices]
+        y_bootstrap = y.iloc[choice_indices]
 
         return X_bootstrap, y_bootstrap
         # end answer
@@ -91,7 +97,7 @@ class RandomForest:
             idx += 1
         
         for i in range(N):
-            y_pred[i] = DecisionTree.majority_vote(predictions[:, i].reshape(N,))
+            y_pred[i] = DecisionTree.majority_vote(predictions[:, i].reshape(self.n_estimator,))
 
         # end answer
         return y_pred
