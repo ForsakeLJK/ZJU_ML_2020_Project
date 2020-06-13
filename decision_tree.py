@@ -336,11 +336,30 @@ class DecisionTree:
         """
         if sample_weights is None:
             sample_weights = np.ones(y.shape[0]) / y.shape[0]
+        else:
+            sample_weights = np.array(sample_weights) / np.sum(sample_weights)
+
         majority_label = y[0]
         #TODO: YOUR CODE HERE
         # begin answer
-        from collections import Counter
-        majority_label = Counter(y).most_common(1)[0][0]
+        y_signed = deepcopy(y)
+        y_signed = np.where(y_signed == 0, -1, 1)
+
+        # weighted labels
+        y_signed = sample_weights * y_signed
+
+        majority_label = np.sign(np.sum(y_signed))
+
+        # restore label range from (-1, 1) to (0, 1)
+        if majority_label > 0:
+            majority_label = 1
+        else:
+            majority_label = 0
+
+        # from collections import Counter
+        # majority_label = Counter(y).most_common(1)[0][0]
+
+        
         # end answer
         return majority_label
 
