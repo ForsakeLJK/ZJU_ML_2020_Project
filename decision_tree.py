@@ -98,32 +98,6 @@ class DecisionTree:
 
         entropy = -entropy
 
-        # N = y.shape[0]
-
-        # # print(sample_weights.T)
-
-        # for i in range(N):
-        #     # print(sample_weights[i] * np.log(sample_weights[i]))
-        #     entropy += sample_weights[i] * np.log(sample_weights[i])
-        
-        # entropy = -entropy
-
-        # print(entropy)
-
-        # print(sample_weights[0], sample_weights[0])
-
-        # labels, cnt = np.unique(y, return_counts=True)
-        # fracs = np.divide(cnt, y.size)
-
-        # entropy = 0.0
-
-        # for frac in fracs:
-        #     entropy += np.multiply(frac, np.log(frac))
-
-        # entropy = -entropy
-
-        # print(entropy)
-
         # end answer
         return entropy
 
@@ -175,14 +149,20 @@ class DecisionTree:
         Returns:
             (float): the intrinsic value calculated.
         """
-        intrinsic_val = 0
 
         N, D = X.shape
-        _, val_cnt = np.unique(X[:, index], return_counts=True)
+        fea_vals, val_cnt = np.unique(X[:, index], return_counts=True)
 
-        for cnt in val_cnt:
-            intrinsic_val += cnt / N * np.log2(cnt/N)
+        intrinsic_val = 0
 
+        for fea_val, cnt in zip(fea_vals, val_cnt):
+            sample_indices = np.argwhere(
+                np.array(X[:, index] == fea_val) == True)
+            sub_sample_weights = sample_weights[sample_indices]
+            sub_weights_sum = np.sum(sub_sample_weights)
+            # weight_sum of S is 1, so it's omitted
+            intrinsic_val += sub_weights_sum * np.log(sub_weights_sum)
+        
         intrinsic_val = -intrinsic_val
 
         return intrinsic_val
