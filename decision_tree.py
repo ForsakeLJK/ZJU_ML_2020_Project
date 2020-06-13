@@ -163,8 +163,12 @@ class DecisionTree:
         info_gain = self._information_gain(X, y, index, sample_weights)
         intrinsic_value = self._intrinsic_value(X, y, index, sample_weights)
 
-        info_gain_ratio = info_gain / intrinsic_value
-        
+        if intrinsic_value != 0:
+            info_gain_ratio = info_gain / intrinsic_value
+        else:
+            # avoid runtime warning
+            info_gain_ratio = np.Infinity
+
         # end answer
         return info_gain_ratio
 
