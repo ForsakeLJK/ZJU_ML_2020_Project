@@ -211,13 +211,20 @@ class DecisionTree:
         if y.size <= 1:
             return float(0)
 
-        labels, cnt = np.unique(y, return_counts=True)
-        fracs = cnt / y.size
-
         gini = 0
 
-        for frac in fracs:
-            gini += np.square(frac)  
+        labels = np.unique(y)
+        # C classes
+        C = labels.shape[0]
+        weight_sums = np.zeros((C,))
+
+        for c in range(C):
+            indices = np.argwhere(
+                np.array(y == labels[c]) == True)
+            weight_sums[c] = np.sum(sample_weights[indices])
+        
+        for weight_sum in weight_sums:
+            gini += np.square(weight_sum)
 
         gini = 1 - gini
 
@@ -248,8 +255,11 @@ class DecisionTree:
         for fea_val, cnt in zip(fea_vals, val_cnt):
             sample_indices = np.argwhere(
                 np.array(X[:, index] == fea_val) == True)
-            new_impurity += cnt / N * \
-                self.gini_impurity(y[sample_indices], sample_weights[sample_indices])
+            sub_sample_weights = sample_weights[sample_indices]
+            sub_weights_sum = np.sum(sub_sample_weights)
+            sub_sample_weights /= sub_weights_sum
+            new_impurity += sub_weights_sum * \
+                self.gini_impurity(y[sample_indices], sub_sample_weights)
 
         # end answer
         return new_impurity
