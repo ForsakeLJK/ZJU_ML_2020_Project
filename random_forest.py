@@ -1,5 +1,6 @@
 import copy
 import numpy as np
+from decision_tree import DecisionTree
 
 
 class RandomForest:
@@ -38,6 +39,16 @@ class RandomForest:
         #TODO: YOUR CODE HERE
         # re‐sample N examples from X with replacement
         # begin answer
+        N, D = X.shape
+        X_bootstrap = np.zeros((N, D))
+        y_bootstrap = np.zeros((N,))
+        
+        for i in range(N):
+            choice_idx = np.random.choice(N, replace=True)
+            X_bootstrap[i] = X[choice_idx]
+            y_bootstrap[i] = y[choice_idx]
+
+        return X_bootstrap, y_bootstrap
         # end answer
 
     def fit(self, X, y):
@@ -49,6 +60,10 @@ class RandomForest:
         """
         #TODO: YOUR CODE HERE
         # begin answer
+        # grow the trees
+        for estimator in self._estimators:
+            X_b, y_b = self._get_bootstrap_dataset(X, y)
+            estimator.fit(X_b, y_b)
         # end answer
         return self
 
@@ -65,5 +80,17 @@ class RandomForest:
         y_pred = np.zeros(N)
         #TODO: YOUR CODE HERE
         # begin answer
+        N, _ = X.shape
+        predictions = np.zeros((self.n_estimator, N))
+
+        idx = 0
+
+        for estimator in self._estimators:
+            predictions[idx] = estimator.predict(X)
+            idx += 1
+        
+        for i in range(N):
+            y_pred[i] = DecisionTree.majority_vote(predictions[:, i].reshape(N,))
+
         # end answer
         return y_pred
