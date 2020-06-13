@@ -271,17 +271,66 @@ class DecisionTree:
         # Note that you need to implement the sampling feature part here for random forest!
         # Hint: You may find `np.random.choice` is useful for sampling.
         # begin answer
+
+        # N, D = X.shape
+
+        # # if sampling features needed
+        # if D <= 1:
+        #     pass
+        # elif self.sample_feature == True:
+        #     # X = deepcopy(X)
+        #     sample_fea_size = np.rint(np.sqrt(D)).astype(int)
+        #     sample_fea_indices = np.random.choice(D, size=sample_fea_size, replace=False)
+        #     sample_fea_indices = np.sort(sample_fea_indices)
+        #     X = X[:, sample_fea_indices]
+        #     y = y[sample_fea_indices]
+        #     sample_weights = sample_weights[sample_fea_indices]
+        #     fea_names = np.array(fea_names)[sample_fea_indices].tolist()
+        #     print(X.shape, y.shape, sample_weights.shape, len(fea_names))
+
         best_feature_idx = 0
         D = X.shape[1]
 
-        score = np.zeros((D,))
-        for d in range(D):
-            score[d] = self.criterion(X, y, d, sample_weights)
-        
-        if self.criterion == self._gini_purification:
-            best_feature_idx = np.argmin(score)
-        else:    
-            best_feature_idx = np.argmax(score)
+        if D <= 1:
+            return 0
+
+        if self.sample_feature == False:
+            if self.criterion == self._gini_purification:
+                score = np.ones((D,))
+
+                for d in range(D):
+                    score[d] = self.criterion(X, y, d, sample_weights)
+
+                best_feature_idx = np.argmin(score)
+            else:
+                score = np.zeros((D,))
+
+                for d in range(D):
+                    score[d] = self.criterion(X, y, d, sample_weights)
+
+                best_feature_idx = np.argmax(score)
+        else:
+            sample_fea_size = np.rint(np.sqrt(D)).astype(int)
+            sample_fea_indices = np.random.choice(D, size=sample_fea_size, replace=False)
+            sample_fea_indices = np.sort(sample_fea_indices)
+
+            if self.criterion == self._gini_purification:
+                score = np.ones((D,))
+
+                for i in range(sample_fea_size):
+                    score[sample_fea_indices[i]] = self.criterion(
+                        X, y, sample_fea_indices[i], sample_weights)
+
+                best_feature_idx = np.argmin(score)
+            else:
+                score = np.zeros((D,))
+
+                for i in range(sample_fea_size):
+                    score[sample_fea_indices[i]] = self.criterion(
+                        X, y, sample_fea_indices[i], sample_weights)
+
+                best_feature_idx = np.argmax(score)
+                
 
         # end answer
         return best_feature_idx
