@@ -76,15 +76,53 @@ class DecisionTree:
         if y.size <= 1:
             return float(0)
 
-        labels, cnt = np.unique(y, return_counts=True)
-        fracs = cnt / y.size
+        # print(np.sum(sample_weights))
 
-        entropy = 0
+        labels = np.unique(y)
+        # C classes
+        C = labels.shape[0]
+        weight_sums = np.zeros((C,))
 
-        for frac in fracs:
-            entropy += frac * np.log(frac)
+        # print(C)
+
+        for c in range(C):
+            indices = np.argwhere(
+                np.array(y == labels[c]) == True)
+            weight_sums[c] = np.sum(sample_weights[indices])
+            # print(weight_sums[c])
+        
+        # print(np.sum(weight_sums))
+
+        for weight_sum in weight_sums:
+            entropy += np.multiply(weight_sum, np.log(weight_sum))
 
         entropy = -entropy
+
+        # N = y.shape[0]
+
+        # # print(sample_weights.T)
+
+        # for i in range(N):
+        #     # print(sample_weights[i] * np.log(sample_weights[i]))
+        #     entropy += sample_weights[i] * np.log(sample_weights[i])
+        
+        # entropy = -entropy
+
+        # print(entropy)
+
+        # print(sample_weights[0], sample_weights[0])
+
+        # labels, cnt = np.unique(y, return_counts=True)
+        # fracs = np.divide(cnt, y.size)
+
+        # entropy = 0.0
+
+        # for frac in fracs:
+        #     entropy += np.multiply(frac, np.log(frac))
+
+        # entropy = -entropy
+
+        # print(entropy)
 
         # end answer
         return entropy
@@ -104,16 +142,21 @@ class DecisionTree:
         info_gain = 0
         #TODO: YOUR CODE HERE
         # begin answer
+        # print(np.sum(sample_weights))
+
         N, D = X.shape
         X_ent = self.entropy(y, sample_weights)
         fea_vals, val_cnt = np.unique(X[:, index], return_counts=True)
-
 
         sub_ent = 0
 
         for fea_val, cnt in zip(fea_vals, val_cnt):
             sample_indices = np.argwhere(np.array(X[:, index] == fea_val) == True)
-            sub_ent += cnt / N * self.entropy(y[sample_indices], sample_weights[sample_indices])
+            sub_sample_weights = sample_weights[sample_indices]
+            sub_weights_sum = np.sum(sub_sample_weights)
+            sub_sample_weights /= sub_weights_sum
+            # weight_sum of S is 1, so it's omitted
+            sub_ent += sub_weights_sum * self.entropy(y[sample_indices], sub_sample_weights)
 
         info_gain = X_ent - sub_ent
 
@@ -257,6 +300,7 @@ class DecisionTree:
         sub_sample_weights = sample_weights[sample_indices]
         
         sub_X = np.delete(sub_X, index, axis=1)
+        sub_sample_weights /= np.sum(sub_sample_weights)
         # end answer
         return sub_X, sub_y, sub_sample_weights
 
@@ -356,10 +400,6 @@ class DecisionTree:
         else:
             majority_label = 0
 
-        # from collections import Counter
-        # majority_label = Counter(y).most_common(1)[0][0]
-
-        
         # end answer
         return majority_label
 
@@ -440,6 +480,7 @@ class DecisionTree:
             # Note: the idx-th feature has been removed from X here
             X_sub, y_sub, sample_weights_sub = self._split_dataset(
                 X, y, best_fea_idx, best_fea_val, sample_weights)
+            # print(np.sum(sample_weights))
             if X_sub.shape[1] == 0:
                 # empty, no other attributes
                 fea_dict[best_fea_val] = self.majority_vote(
@@ -454,7 +495,8 @@ class DecisionTree:
                     y_sub, sample_weights=sample_weights_sub)
             else:
                 # general case
-                fea_dict[best_fea_val] = self._build_tree(X_sub, y_sub, fea_names, depth+1, sample_weights)
+                fea_dict[best_fea_val] = self._build_tree(
+                    X_sub, y_sub, fea_names, depth+1, sample_weights_sub)
             
         # step 5
         mytree[best_fea_name] = fea_dict
