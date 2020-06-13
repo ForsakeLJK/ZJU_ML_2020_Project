@@ -438,16 +438,20 @@ class DecisionTree:
         for best_fea_val in best_fea_vals:
             fea_dict[best_fea_val] = {}
             # Note: the idx-th feature has been removed from X here
-            X_sub, y_sub, sample_weights_sub = self._split_dataset(X, y, best_fea_idx, best_fea_val, sample_weights)
+            X_sub, y_sub, sample_weights_sub = self._split_dataset(
+                X, y, best_fea_idx, best_fea_val, sample_weights)
             if X_sub.shape[1] == 0:
                 # empty, no other attributes
-                fea_dict[best_fea_val] = self.majority_vote(y_sub)
+                fea_dict[best_fea_val] = self.majority_vote(
+                    y_sub, sample_weights=sample_weights_sub)
             elif X_sub.shape[0] < self.min_samples_leaf:
                 # min_data_leaf reached
-                fea_dict[best_fea_val] = self.majority_vote(y_sub)
+                fea_dict[best_fea_val] = self.majority_vote(
+                    y_sub, sample_weights=sample_weights_sub)
             elif (depth == self.max_depth) or (y_sub == y_sub[0]).all(): # or (X_sub == X_sub[0]).all():
                 # max_depth reached, or samples in subset are all the same
-                fea_dict[best_fea_val] = self.majority_vote(y_sub)
+                fea_dict[best_fea_val] = self.majority_vote(
+                    y_sub, sample_weights=sample_weights_sub)
             else:
                 # general case
                 fea_dict[best_fea_val] = self._build_tree(X_sub, y_sub, fea_names, depth+1, sample_weights)
