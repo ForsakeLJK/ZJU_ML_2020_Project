@@ -4,10 +4,6 @@ from decision_tree import DecisionTree
 
 
 class Adaboost:
-    '''Adaboost Classifier.
-
-    Note that this class only support binary classification.
-    '''
 
     def __init__(self,
                  base_learner,
@@ -33,9 +29,7 @@ class Adaboost:
             X: training features, of shape (N, D). Each X[i] is a training sample.
             y: vector of training labels, of shape (N,).
         """
-        #TODO: YOUR CODE HERE
 
-        # begin answer
         N, D = X.shape
 
         # initial weights -> 1/N
@@ -59,7 +53,6 @@ class Adaboost:
             
             idx += 1
 
-        # end answer
         return self
 
     def predict(self, X):
@@ -73,8 +66,7 @@ class Adaboost:
         """
         N = X.shape[0]
         y_pred = np.zeros(N)
-        #TODO: YOUR CODE HERE
-        # begin answer
+
         N, _ = X.shape
         predictions = np.zeros((self.n_estimator, N))
 
@@ -89,5 +81,4 @@ class Adaboost:
                 predictions[:, i].reshape(self.n_estimator,), 
                 sample_weights=np.array(self._alphas))
 
-        # end answer
         return y_pred
