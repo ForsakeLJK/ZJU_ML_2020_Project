@@ -2,10 +2,6 @@ import numpy as np
 from copy import deepcopy
 
 class DecisionTree:
-    '''Decision Tree Classifier.
-
-    Note that this class only supports binary classification.
-    '''
 
     def __init__(self,
                  criterion,
@@ -71,8 +67,7 @@ class DecisionTree:
             (float): the entropy for y.
         """
         entropy = 0.0
-        #TODO: YOUR CODE HERE
-        # begin answer
+
         if y.size <= 1:
             return float(0)
 
@@ -98,7 +93,6 @@ class DecisionTree:
 
         entropy = -entropy
 
-        # end answer
         return entropy
 
     def _information_gain(self, X, y, index, sample_weights):
@@ -114,8 +108,7 @@ class DecisionTree:
             (float): the information gain calculated.
         """
         info_gain = 0
-        #TODO: YOUR CODE HERE
-        # begin answer
+
         # print(np.sum(sample_weights))
 
         N, D = X.shape
@@ -134,7 +127,6 @@ class DecisionTree:
 
         info_gain = X_ent - sub_ent
 
-        # end answer
         return info_gain
     
     def _intrinsic_value(self, X, y, index, sample_weights):
@@ -181,8 +173,6 @@ class DecisionTree:
         """
         info_gain_ratio = 0
 
-        #TODO: YOUR CODE HERE
-        # begin answer
         info_gain = self._information_gain(X, y, index, sample_weights)
         intrinsic_value = self._intrinsic_value(X, y, index, sample_weights)
 
@@ -192,7 +182,6 @@ class DecisionTree:
             # avoid runtime warning
             info_gain_ratio = np.Infinity
 
-        # end answer
         return info_gain_ratio
 
     @staticmethod
@@ -206,8 +195,7 @@ class DecisionTree:
         Returns:
             (float): the gini impurity for y.
         """
-        #TODO: YOUR CODE HERE
-        # begin answer
+
         if y.size <= 1:
             return float(0)
 
@@ -228,7 +216,6 @@ class DecisionTree:
 
         gini = 1 - gini
 
-        # end answer
         return gini
 
     def _gini_purification(self, X, y, index, sample_weights):
@@ -244,8 +231,7 @@ class DecisionTree:
             (float): the resulted gini impurity after splitting by this feature.
         """
         new_impurity = 1
-        #TODO: YOUR CODE HERE
-        # begin answer
+
         N, D = X.shape
 
         fea_vals, val_cnt = np.unique(X[:, index], return_counts=True)
@@ -261,7 +247,6 @@ class DecisionTree:
             new_impurity += sub_weights_sum * \
                 self.gini_impurity(y[sample_indices], sub_sample_weights)
 
-        # end answer
         return new_impurity
 
     def _split_dataset(self, X, y, index, value, sample_weights):
@@ -280,9 +265,7 @@ class DecisionTree:
             (np.array): the subset of sample weights whose index-th feature equals value.
         """
         sub_X, sub_y, sub_sample_weights = X, y, sample_weights
-        #TODO: YOUR CODE HERE
-        # Hint: Do not forget to remove the index-th feature from X.
-        # begin answer
+
         sample_indices = np.argwhere(np.array(X[:, index] == value) == True)
         sample_indices = sample_indices.ravel()
         sub_X = X[sample_indices]
@@ -291,7 +274,7 @@ class DecisionTree:
         
         sub_X = np.delete(sub_X, index, axis=1)
         sub_sample_weights /= np.sum(sub_sample_weights)
-        # end answer
+
         return sub_X, sub_y, sub_sample_weights
 
     def _choose_best_feature(self, X, y, sample_weights):
@@ -305,10 +288,6 @@ class DecisionTree:
         Returns:
             (int): the index for the best feature
         """
-        #TODO: YOUR CODE HERE
-        # Note that you need to implement the sampling feature part here for random forest!
-        # Hint: You may find `np.random.choice` is useful for sampling.
-        # begin answer
 
         best_feature_idx = 0
         D = X.shape[1]
@@ -352,9 +331,7 @@ class DecisionTree:
                         X, y, sample_fea_indices[i], sample_weights)
 
                 best_feature_idx = np.argmax(score)
-                
 
-        # end answer
         return best_feature_idx
 
     @staticmethod
@@ -374,8 +351,7 @@ class DecisionTree:
             sample_weights = np.array(sample_weights) / np.sum(sample_weights)
 
         majority_label = y[0]
-        #TODO: YOUR CODE HERE
-        # begin answer
+
         y_signed = deepcopy(y)
         y_signed = np.where(y_signed == 0, -1, 1)
 
@@ -390,7 +366,6 @@ class DecisionTree:
         else:
             majority_label = 0
 
-        # end answer
         return majority_label
 
     def _build_tree(self, X, y, feature_names, depth, sample_weights):
@@ -405,30 +380,7 @@ class DecisionTree:
 
         Returns:
             (dict): a dict denoting the decision tree. 
-            Example:
-                The first best feature name is 'title', and it has 5 different values: 0,1,2,3,4. For 'title' == 4, the next best feature name is 'pclass', we continue split the remain data. If it comes to the leaf, we use the majority_label by calling majority_vote.
-                mytree = {
-                    'title': {
-                        0: subtree0,
-                        1: subtree1,
-                        2: subtree2,
-                        3: subtree3,
-                        4: {
-                            'pclass': {
-                                1: majority_vote([1, 1, 1, 1]) # which is 1, majority_label
-                                2: majority_vote([1, 0, 1, 1]) # which is 1
-                                3: majority_vote([0, 0, 0]) # which is 0
-                            }
-                        }
-                    }
-                }
         """
-
-        #TODO: YOUR CODE HERE
-        # Use `_choose_best_feature` to find the best feature to split the X. Then use `_split_dataset` to
-        # get subtrees.
-        # Hint: You may find `np.unique` is useful.
-        # begin answer
 
         '''My implementation
         1.  find the best feature, add its name to dict as a key
@@ -491,7 +443,6 @@ class DecisionTree:
         # step 5
         mytree[best_fea_name] = fea_dict
 
-        # end answer
         return mytree
 
     def predict(self, X):
@@ -515,8 +466,7 @@ class DecisionTree:
             Returns:
                 (int): predicted testing sample label.
             """
-            #TODO: YOUR CODE HERE
-            # begin answer
+
             pred_label = 0
 
             test_fea = (list(tree.keys()))[0]
@@ -540,10 +490,8 @@ class DecisionTree:
                 pred_label = subtree
 
             return pred_label
-            # end answer
 
-        #TODO: YOUR CODE HERE
-        # begin answer
+
         if self._tree is None:
             raise RuntimeError("Estimator not fitted, call `fit` first")
 
@@ -560,7 +508,6 @@ class DecisionTree:
             predictions[i] = _classify(dt, X[i])
         
         return predictions
-        # end answer
 
     def show(self):
         """Plot the tree using matplotlib
