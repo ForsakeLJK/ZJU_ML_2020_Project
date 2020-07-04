@@ -4,10 +4,6 @@ from decision_tree import DecisionTree
 
 
 class RandomForest:
-    '''Random Forest Classifier.
-
-    Note that this class only support binary classification.
-    '''
 
     def __init__(self,
                  base_learner,
@@ -36,9 +32,7 @@ class RandomForest:
             X_bootstrap: a sampled dataset, of shape (N, D).
             y_bootstrap: the labels for sampled dataset.
         """
-        #TODO: YOUR CODE HERE
-        # re‐sample N examples from X with replacement
-        # begin answer
+
         N, D = X.shape
         X_bootstrap = np.zeros((N, D))
         y_bootstrap = np.zeros((N,))
@@ -50,7 +44,6 @@ class RandomForest:
         y_bootstrap = y.iloc[choice_indices]
 
         return X_bootstrap, y_bootstrap
-        # end answer
 
     def fit(self, X, y):
         """Build the random forest according to the training data.
@@ -59,13 +52,12 @@ class RandomForest:
             X: training features, of shape (N, D). Each X[i] is a training sample.
             y: vector of training labels, of shape (N,).
         """
-        #TODO: YOUR CODE HERE
-        # begin answer
+
         # grow the trees
         for estimator in self._estimators:
             X_b, y_b = self._get_bootstrap_dataset(X, y)
             estimator.fit(X_b, y_b)
-        # end answer
+
         return self
 
     def predict(self, X):
@@ -79,8 +71,7 @@ class RandomForest:
         """
         N = X.shape[0]
         y_pred = np.zeros(N)
-        #TODO: YOUR CODE HERE
-        # begin answer
+
         N, _ = X.shape
         predictions = np.zeros((self.n_estimator, N))
 
@@ -93,5 +84,4 @@ class RandomForest:
         for i in range(N):
             y_pred[i] = DecisionTree.majority_vote(predictions[:, i].reshape(self.n_estimator,))
 
-        # end answer
         return y_pred
